@@ -9,11 +9,21 @@ use serde::{Deserialize, Serialize};
 
 use crate::calibration::Calibration;
 
-/// Top-level config: an ordered list of faders.
+/// Top-level config: an ordered list of faders plus named app categories.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Config {
     pub fader: Vec<FaderConfig>,
+    pub category: Vec<CategoryDef>,
+}
+
+/// A named group of apps whose volume moves together.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CategoryDef {
+    pub name: String,
+    /// Member app identities (`application.process.binary` values).
+    pub members: Vec<String>,
 }
 
 /// One fader: where its level comes from and what it drives.
@@ -26,6 +36,9 @@ pub struct FaderConfig {
     pub axis: i32,
     /// Maximum volume % this fader reaches at the top of its throw.
     pub max_percent: i32,
+    /// A virtual fader's current level (0..=100), persisted across restarts.
+    /// Ignored for physical faders (the hardware position is the level).
+    pub value: i32,
     pub calibration: Calibration,
     pub target: Target,
 }
@@ -37,6 +50,7 @@ impl Default for FaderConfig {
             kind: FaderKind::Physical,
             axis: 0,
             max_percent: 100,
+            value: 50,
             calibration: Calibration::default(),
             target: Target::default(),
         }
@@ -130,6 +144,11 @@ mod tests {
         assert!(matches!(&cfg.fader[2].target, Target::Category { name } if name == "Music"));
         assert_eq!(cfg.fader[3].kind, FaderKind::Virtual);
         assert!(matches!(&cfg.fader[3].target, Target::Unassigned));
+        assert_eq!(cfg.fader[3].value, 65);
+
+        assert_eq!(cfg.category.len(), 1);
+        assert_eq!(cfg.category[0].name, "Music");
+        assert_eq!(cfg.category[0].members, ["spotify", "amberol"]);
     }
 
     #[test]
@@ -164,8 +183,10 @@ mod tests {
         )
         .unwrap();
         assert_eq!(cfg.fader[0].max_percent, 100);
+        assert_eq!(cfg.fader[0].value, 50);
         assert_eq!(cfg.fader[0].kind, FaderKind::Physical);
         assert_eq!(cfg.fader[0].target, Target::Unassigned);
         assert_eq!(cfg.fader[0].calibration, Calibration::default());
+        assert!(cfg.category.is_empty());
     }
 }

@@ -44,11 +44,20 @@ axis = 2
 type = "category"
 name = "Music"
 
-# A virtual fader (no hardware) catching everything not otherwise assigned.
+# A virtual fader (no hardware) catching everything not otherwise assigned:
+# every stream that is not in a category and not directly targeted by another
+# fader. `value` is its current level, persisted across restarts.
 [[fader]]
 label = "Everything Else"
 kind = "virtual"
 axis = -1
+value = 65
 
 [fader.target]
 type = "unassigned"
+
+# Categories group apps that move together (matched on
+# application.process.binary, case-insensitive).
+[[category]]
+name = "Music"
+members = ["spotify", "amberol"]

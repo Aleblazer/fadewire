@@ -81,7 +81,9 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
       (tapers, snap-band EMA, mute detent, hysteresis, cubic volume mapping)
 - [x] Config model (`~/.config/fadewire/config.toml`)
 - [x] Arch packaging: PKGBUILD + udev rules + systemd user unit
-- [ ] PipeWire mixer backend (sink + stream volumes, hotplug, categories)
+- [x] PipeWire mixer backend (initial: sink + per-app stream volumes via
+      pipewire-pulse, categories + Everything Else, 1 Hz poll; native
+      pipewire-rs events later) — try `fadewired list` / `fadewired set`
 - [ ] hidraw reader (USB + BLE) with reconnect
 - [ ] D-Bus service + real `fadewire` CLI commands
 - [ ] Virtual faders + evdev hotkeys

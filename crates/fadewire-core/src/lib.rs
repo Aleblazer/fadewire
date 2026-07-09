@@ -9,6 +9,7 @@
 pub mod calibration;
 pub mod config;
 pub mod filter;
+pub mod mixer;
 
 /// Convert an applied percentage (0..=100) to a PipeWire *native* channel
 /// volume (linear amplitude). PipeWire's `Props` `channelVolumes` are linear,

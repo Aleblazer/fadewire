@@ -10,3 +10,6 @@ authors.workspace = true
 [dependencies]
 fadewire-core = { path = "../fadewire-core" }
 anyhow = "1"
+# PulseAudio client API — served by pipewire-pulse. Needs libpulse at
+# build/run time (Arch: libpulse; Debian/CI: libpulse-dev).
+libpulse-binding = "2"

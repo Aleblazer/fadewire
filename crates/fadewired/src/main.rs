@@ -1,14 +1,17 @@
-//! FadeWire daemon (pre-alpha skeleton).
+//! FadeWire daemon.
 //!
-//! Roadmap for this binary (see docs/architecture.md):
-//! 1. hidraw reader for the vendor-page fader report (id 2, up to eight
-//!    signed 16-bit LE axes) with poll-based reconnect.
-//! 2. PipeWire mixer backend (sinks + per-app streams; libpulse via
-//!    pipewire-pulse first, native pipewire-rs later).
-//! 3. D-Bus service (`xyz.splitlogic.FadeWire`) for the CLI/GUI.
-//! 4. Optional evdev hotkey listener (F13–F24, pass-through).
+//! Modes:
+//!   fadewired               run the drive loop (systemd user service)
+//!   fadewired list          print sinks + app streams as FadeWire sees them
+//!   fadewired set <fader> <pct>   one-shot apply (verification until D-Bus)
+//!
+//! Roadmap (see docs/architecture.md): hidraw reader for physical faders,
+//! D-Bus service (`xyz.splitlogic.FadeWire`) for the CLI/GUI, evdev hotkeys.
 
-use anyhow::Result;
+mod engine;
+mod pulse;
+
+use anyhow::{bail, Result};
 use fadewire_core::config::Config;
 use std::path::PathBuf;
 
@@ -27,26 +30,46 @@ fn config_path() -> PathBuf {
     base.join("fadewire").join("config.toml")
 }
 
-fn main() -> Result<()> {
+fn load_config() -> Result<Config> {
     let path = config_path();
-    let cfg = if path.exists() {
-        Config::load(&path)?
+    if path.exists() {
+        Ok(Config::load(&path)?)
     } else {
         eprintln!(
-            "fadewired: no config at {} — starting with an empty layout",
+            "fadewired: no config at {} — starting with an empty layout \
+             (see /usr/share/doc/fadewire/config.example.toml)",
             path.display()
         );
-        Config::default()
-    };
-
-    println!(
-        "fadewired {} — {} fader(s) configured",
-        env!("CARGO_PKG_VERSION"),
-        cfg.fader.len()
-    );
-    for f in &cfg.fader {
-        println!("  · {:?} fader \"{}\" -> {:?}", f.kind, f.label, f.target);
+        Ok(Config::default())
     }
-    println!("pre-alpha skeleton: the PipeWire and hidraw backends are the next milestone.");
-    Ok(())
+}
+
+fn main() -> Result<()> {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    match args.first().map(String::as_str) {
+        None => {
+            let cfg = load_config()?;
+            println!(
+                "fadewired {} — {} fader(s), {} category(ies) configured",
+                env!("CARGO_PKG_VERSION"),
+                cfg.fader.len(),
+                cfg.category.len()
+            );
+            engine::run(cfg)
+        }
+        Some("list") => engine::list(),
+        Some("set") => {
+            let (label, pct) = match (args.get(1), args.get(2)) {
+                (Some(l), Some(p)) => (l.clone(), p.parse::<u32>()?),
+                _ => bail!("usage: fadewired set <fader-label> <percent>"),
+            };
+            let cfg = load_config()?;
+            engine::set_once(&cfg, &label, pct.min(100))
+        }
+        Some("--version") | Some("version") => {
+            println!("fadewired {}", env!("CARGO_PKG_VERSION"));
+            Ok(())
+        }
+        Some(other) => bail!("unknown command \"{other}\" (try: fadewired [list|set|version])"),
+    }
 }
