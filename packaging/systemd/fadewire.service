@@ -1,0 +1,22 @@
+# FadeWire daemon — systemd *user* unit.
+#   systemctl --user enable --now fadewire.service
+#
+# WantedBy=default.target (not graphical-session.target) on purpose: the
+# daemon needs no compositor, so faders work under gamescope Game Mode and on
+# compositors without XDG autostart (Hyprland, Niri).
+
+[Unit]
+Description=FadeWire fader mixer daemon
+Documentation=https://github.com/Aleblazer/fadewire
+# Start after PipeWire when it's present; not a hard requirement — the daemon
+# reconnects to the audio server on its own.
+After=pipewire.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/fadewired
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

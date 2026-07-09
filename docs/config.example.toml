@@ -1,0 +1,54 @@
+# FadeWire example configuration.
+# Lives at ~/.config/fadewire/config.toml ($XDG_CONFIG_HOME respected).
+#
+# Faders are listed in display order. `kind` is "physical" (driven by a HID
+# axis) or "virtual" (driven by the GUI, hotkeys, or `fadewire set/nudge`).
+
+# A physical fader driving an output device (PipeWire sink), with the
+# calibration captured by sweeping the fader and a 10 mV mute detent so the
+# bottom of the throw is hard silence.
+[[fader]]
+label = "Game"
+kind = "physical"
+axis = 0
+max_percent = 100
+
+[fader.calibration]
+min = 4
+max = 3215
+taper = "linear"
+mute_raw = 10
+
+[fader.target]
+type = "sink"
+name_match = "Maxwell Game"
+
+# A physical fader driving one application's streams wherever they play.
+[[fader]]
+label = "Chat"
+kind = "physical"
+axis = 1
+max_percent = 80
+
+[fader.target]
+type = "app"
+binary = "discord"
+
+# A physical fader driving a named category of apps that move together.
+[[fader]]
+label = "Music"
+kind = "physical"
+axis = 2
+
+[fader.target]
+type = "category"
+name = "Music"
+
+# A virtual fader (no hardware) catching everything not otherwise assigned.
+[[fader]]
+label = "Everything Else"
+kind = "virtual"
+axis = -1
+
+[fader.target]
+type = "unassigned"

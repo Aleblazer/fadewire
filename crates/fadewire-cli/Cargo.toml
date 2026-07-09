@@ -1,0 +1,15 @@
+[package]
+name = "fadewire-cli"
+description = "FadeWire control CLI — talks to fadewired over D-Bus (bind it in your compositor!)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "fadewire"
+path = "src/main.rs"
+
+[dependencies]
+fadewire-core = { path = "../fadewire-core" }

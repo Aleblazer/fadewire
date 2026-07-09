@@ -1,0 +1,13 @@
+# FadeWire: unprivileged access to the fader HID device.
+# ZMK's default USB VID/PID (1d50:615e), used by the zmk-hid-io vendor-page
+# fader report — covers the LiberArk68 dongle and SailStone units.
+#
+# TAG+="uaccess" grants the active seat's logged-in user access via ACLs —
+# no plugdev/input group membership needed.
+
+# USB transport (attributes live on the USB parent device).
+KERNEL=="hidraw*", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="615e", TAG+="uaccess"
+
+# Bluetooth (HID-over-GATT): no USB parent, but the HID device name carries
+# the ids as <bus>:<vid>:<pid> (bus 0005 = Bluetooth).
+KERNEL=="hidraw*", KERNELS=="*1D50:615E*", TAG+="uaccess"
