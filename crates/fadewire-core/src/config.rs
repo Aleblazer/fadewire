@@ -167,6 +167,10 @@ mod tests {
                 },
                 FaderConfig::default(),
             ],
+            category: vec![CategoryDef {
+                name: "Music".into(),
+                members: vec!["spotify".into()],
+            }],
         };
         let text = cfg.to_toml().unwrap();
         let back = Config::from_toml(&text).unwrap();
