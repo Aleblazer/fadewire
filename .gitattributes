@@ -1,0 +1,3 @@
+# Linux-targeted repo: keep LF everywhere (PKGBUILD, udev rules, and unit
+# files break with CRLF), even when edited from Windows.
+* text=auto eol=lf
