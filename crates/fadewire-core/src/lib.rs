@@ -10,6 +10,7 @@ pub mod calibration;
 pub mod config;
 pub mod filter;
 pub mod mixer;
+pub mod state;
 
 /// The fader HID report (vendor page 0xFF00, report id 2) carries up to
 /// eight signed 16-bit little-endian axes of raw wiper mV.

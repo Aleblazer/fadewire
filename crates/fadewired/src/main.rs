@@ -3,37 +3,23 @@
 //! Modes:
 //!   fadewired               run the drive loop (systemd user service)
 //!   fadewired list          print sinks + app streams as FadeWire sees them
-//!   fadewired set <fader> <pct>   one-shot apply (verification until D-Bus)
+//!   fadewired set <fader> <pct>   one-shot apply (works without the daemon)
 //!   fadewired watch         dump raw fader axis values as they arrive
 //!
-//! Roadmap (see docs/architecture.md): D-Bus service
-//! (`xyz.splitlogic.FadeWire`) for the CLI/GUI, evdev hotkeys.
+//! While running, the daemon serves `xyz.splitlogic.FadeWire` on the session
+//! bus — the `fadewire` CLI is the client. Next up: evdev hotkeys, GUI.
 
+mod dbus;
 mod engine;
 mod hid;
+mod paths;
 mod pulse;
 
 use anyhow::{bail, Result};
 use fadewire_core::config::Config;
-use std::path::PathBuf;
-
-/// `$XDG_CONFIG_HOME/fadewire/config.toml`, falling back to
-/// `~/.config/fadewire/config.toml`.
-fn config_path() -> PathBuf {
-    let base = std::env::var_os("XDG_CONFIG_HOME")
-        .map(PathBuf::from)
-        .filter(|p| p.is_absolute())
-        .unwrap_or_else(|| {
-            std::env::var_os("HOME")
-                .map(PathBuf::from)
-                .unwrap_or_default()
-                .join(".config")
-        });
-    base.join("fadewire").join("config.toml")
-}
 
 fn load_config() -> Result<Config> {
-    let path = config_path();
+    let path = paths::config();
     if path.exists() {
         Ok(Config::load(&path)?)
     } else {

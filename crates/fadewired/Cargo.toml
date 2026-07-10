@@ -17,3 +17,5 @@ libpulse-binding = "2"
 # BLE). Builds the bundled C hidapi; needs libudev (Arch: systemd-libs;
 # Debian/CI: libudev-dev).
 hidapi = "2"
+# Session-bus service for the CLI/GUI (pure Rust).
+zbus = "5"

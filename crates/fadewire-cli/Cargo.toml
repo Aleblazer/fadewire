@@ -12,4 +12,5 @@ name = "fadewire"
 path = "src/main.rs"
 
 [dependencies]
-fadewire-core = { path = "../fadewire-core" }
+anyhow = "1"
+zbus = "5"
