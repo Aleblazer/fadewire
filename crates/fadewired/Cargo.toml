@@ -13,3 +13,7 @@ anyhow = "1"
 # PulseAudio client API — served by pipewire-pulse. Needs libpulse at
 # build/run time (Arch: libpulse; Debian/CI: libpulse-dev).
 libpulse-binding = "2"
+# hidraw access to the fader device (usage-page matching works for USB and
+# BLE). Builds the bundled C hidapi; needs libudev (Arch: systemd-libs;
+# Debian/CI: libudev-dev).
+hidapi = "2"

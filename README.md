@@ -84,7 +84,9 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 - [x] PipeWire mixer backend (initial: sink + per-app stream volumes via
       pipewire-pulse, categories + Everything Else, 1 Hz poll; native
       pipewire-rs events later) — try `fadewired list` / `fadewired set`
-- [ ] hidraw reader (USB + BLE) with reconnect
+- [x] hidraw reader (USB + BLE, usage-page matching, auto-reconnect) feeding
+      the ported signal path — physical faders drive volumes end-to-end;
+      `fadewired watch` dumps raw axes for hardware debugging
 - [ ] D-Bus service + real `fadewire` CLI commands
 - [ ] Virtual faders + evdev hotkeys
 - [ ] AUR publication; CachyOS repo request once stable

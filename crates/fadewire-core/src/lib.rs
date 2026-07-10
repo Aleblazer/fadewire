@@ -11,6 +11,10 @@ pub mod config;
 pub mod filter;
 pub mod mixer;
 
+/// The fader HID report (vendor page 0xFF00, report id 2) carries up to
+/// eight signed 16-bit little-endian axes of raw wiper mV.
+pub const MAX_AXES: usize = 8;
+
 /// Convert an applied percentage (0..=100) to a PipeWire *native* channel
 /// volume (linear amplitude). PipeWire's `Props` `channelVolumes` are linear,
 /// while every user-facing mixer (pavucontrol, pactl %) works on a cubic

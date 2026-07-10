@@ -4,11 +4,13 @@
 //!   fadewired               run the drive loop (systemd user service)
 //!   fadewired list          print sinks + app streams as FadeWire sees them
 //!   fadewired set <fader> <pct>   one-shot apply (verification until D-Bus)
+//!   fadewired watch         dump raw fader axis values as they arrive
 //!
-//! Roadmap (see docs/architecture.md): hidraw reader for physical faders,
-//! D-Bus service (`xyz.splitlogic.FadeWire`) for the CLI/GUI, evdev hotkeys.
+//! Roadmap (see docs/architecture.md): D-Bus service
+//! (`xyz.splitlogic.FadeWire`) for the CLI/GUI, evdev hotkeys.
 
 mod engine;
+mod hid;
 mod pulse;
 
 use anyhow::{bail, Result};
@@ -58,6 +60,7 @@ fn main() -> Result<()> {
             engine::run(cfg)
         }
         Some("list") => engine::list(),
+        Some("watch") => engine::watch(),
         Some("set") => {
             let (label, pct) = match (args.get(1), args.get(2)) {
                 (Some(l), Some(p)) => (l.clone(), p.parse::<u32>()?),
@@ -70,6 +73,6 @@ fn main() -> Result<()> {
             println!("fadewired {}", env!("CARGO_PKG_VERSION"));
             Ok(())
         }
-        Some(other) => bail!("unknown command \"{other}\" (try: fadewired [list|set|version])"),
+        Some(other) => bail!("unknown command \"{other}\" (try: fadewired [list|watch|set|version])"),
     }
 }
